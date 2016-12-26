@@ -1,4 +1,4 @@
-var arr = [5, 6, 4, 7, 3, 8, 2, 9, 1]
+var arr = [5, 8, 3, 1, 2, 4, 6, 7, 9]
 
 function node(data) {
   this.value = data
@@ -10,7 +10,7 @@ function BST() {
   this.root = null
 }
 
-BST.prototype.push = function(value) {
+BST.prototype.insert = function(value) {
   if (this.root === null) {
     this.root = new node(value)
     return
@@ -34,6 +34,61 @@ BST.prototype.push = function(value) {
         currentNode = currentNode.right
       }
     }
+  }
+}
+
+BST.prototype.delete = function(value) {
+  if (this.root === null) {
+    return
+  }
+
+  var parentNode = null
+  var currentNode = this.root
+  while(currentNode !== null && currentNode.value !== value) {
+    parentNode = currentNode
+    if (value < currentNode.value) {
+      currentNode = currentNode.left
+    } else {
+      currentNode = currentNode.right
+    }
+  }
+
+  // BST 上没有该值
+  if (currentNode === null) {
+    return
+  }
+
+  if (currentNode.left === null && currentNode.right === null) {
+    if (currentNode === parentNode.left) {
+      parentNode.left = null
+    } else {
+      parentNode.right = null
+    }
+  } else if (currentNode.left === null) {
+    if (currentNode === parentNode.left) {
+      parentNode.left = currentNode.right
+    } else {
+      parentNode.right = currentNode.right
+    }
+    currentNode = null
+  } else if (currentNode.right === null) {
+    if (currentNode === parentNode.left) {
+      parentNode.left = currentNode.left
+    } else {
+      parentNode.right = currentNode.left
+    }
+  } else {
+    // 有两个孩子的情况，当前结点与左子树中最大的元素交换，然后删除当前结点。
+    // 左子树最大的元素一定是叶子结点，交换后，当前结点即为叶子结点，删除参考没有孩子的情况。
+    // 另一种方法是，当前结点与右子树中最小的元素交换，然后删除当前结点。
+    var leftNode = currentNode.left
+    var leftParentNode = currentNode
+    while(leftNode.right !== null) {
+      leftParentNode = leftNode
+      leftNode = leftNode.right
+    }
+    currentNode.value = leftNode.value
+    leftParentNode.right = null
   }
 }
 
@@ -74,16 +129,18 @@ BST.prototype.invert = function () {
 BST.prototype.initByArr = function(arr) {
   var ctx = this
   arr.forEach(function(item) {
-    ctx.push(item)
+    ctx.insert(item)
   })
 }
 
 
 var tree = new BST()
 tree.initByArr(arr)
+console.log(tree)
+tree.delete(3)
 tree.traverse(function (value) {
   console.log(value)
 })
-// console.log(tree)
+console.log(tree)
 // tree.invert()
 // console.log(tree)
